@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>摩尔纹隐藏文字生成器 - 匆匆</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0c0c1e 0%, #1a1a3e 30%, #0f2847 60%, #1a1a2e 100%);
+            min-height: 100vh;
+            padding: 15px;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(0, 212, 255, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(156, 39, 176, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(76, 175, 80, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            color: #fff;
+            font-size: 24px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin: 0;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-copyright {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 12px;
+        }
+
+        .header-copyright .copyright-icon {
+            color: rgba(0, 212, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .header-copyright .copyright-text {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .header-copyright .copyright-wechat {
+            color: #00d4ff;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2), rgba(156, 39, 176, 0.2));
+            padding: 6px 14px;
+            border-radius: 15px;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+            border: 1px solid rgba(0, 212, 255, 0.4);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+            height: calc(100vh - 140px);
+        }
+
+        .panel {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            overflow-y: auto;
+            max-height: 100%;
+        }
+
+        .panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 3px;
+        }
+
+        .panel::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.3);
+            border-radius: 3px;
+        }
+
+        .panel-title {
+            color: #00d4ff;
+            font-size: 16px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group input[type="text"]:focus,
+        .form-group input[type="number"]:focus {
+            outline: none;
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+        }
+
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2);
+            color: #fff;
+            font-size: 13px;
+            resize: none;
+            min-height: 70px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .form-group textarea:focus {
+            outline: none;
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2), inset 0 0 20px rgba(0, 212, 255, 0.05);
+        }
+
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.2) !important;
+            color: #fff !important;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        select option {
+            background-color: #1a1a3e !important;
+            color: #fff !important;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.2);
+        }
+
+        .slider-container {
+            position: relative;
+        }
+
+        .slider-container input[type="range"] {
+            width: 100%;
+            height: 4px;
+            -webkit-appearance: none;
+            appearance: none;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+            outline: none;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+            transition: transform 0.2s ease;
+        }
+
+        .slider-container input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .slider-value {
+            display: inline-block;
+            float: right;
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-donate {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-donate:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.5);
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-row .btn {
+            flex: 1;
+            margin-top: 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            color: #fff;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .qr-code-placeholder {
+            width: 250px;
+            height: 250px;
+            background: #fff;
+            margin: 0 auto 20px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border: none;
+            padding: 10px 30px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: center;
+        }
+
+        #outputCanvas {
+            max-width: 100%;
+            max-height: calc(100vh - 300px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 60px rgba(0, 212, 255, 0.1);
+        }
+
+        .download-links {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .info-box {
+            display: none;
+        }
+
+        .copyright {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 11px;
+            margin-top: 10px;
+            letter-spacing: 1px;
+        }
+
+        .copyright-banner {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 16px;
+            padding: 12px 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 20px rgba(0, 212, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .copyright-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .copyright-icon {
+            font-size: 18px;
+            color: rgba(0, 212, 255, 0.8);
+            font-weight: 300;
+        }
+
+        .copyright-text {
+            font-size: 13px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+        }
+
+        .copyright-wechat {
+            font-size: 12px;
+            color: rgba(0, 212, 255, 0.7);
+            background: rgba(0, 212, 255, 0.15);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .preset-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .preset-btn {
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .preset-btn:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: rgba(0, 212, 255, 0.3);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 212, 255, 0.2);
+        }
+
+        select option {
+            background-color: #1a1a2e !important;
+            color: #fff !important;
+        }
+
+        .canvas-size-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .canvas-size-item {
+            flex: 1;
+        }
+
+        .canvas-size-item input {
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                height: auto;
+                gap: 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+                margin-bottom: 12px;
+            }
+
+            body {
+                overflow-y: auto;
+                min-height: 100vh;
+            }
+
+            #outputCanvas {
+                max-height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-row">
+            <h1>🔍 摩尔纹隐藏文字生成器</h1>
+            <div class="header-copyright">
+                <span class="copyright-icon">©</span>
+                <span class="copyright-text">设计与开发：匆匆</span>
+                <span class="copyright-wechat">微信：7033066</span>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="panel">
+                <div class="panel-title">⚙️ 参数设置</div>
+                
+                <div class="form-group">
+                    <label for="hiddenText">隐藏文字内容</label>
+                    <textarea id="hiddenText" placeholder="输入需要隐藏的文字内容"></textarea>
+                </div>
+
+                <div class="form-group canvas-size-row">
+                    <div class="canvas-size-item">
+                        <label for="canvasWidth">宽度</label>
+                        <input type="number" id="canvasWidth" value="800" min="100" max="2000">
+                    </div>
+                    <div class="canvas-size-item">
+                        <label for="canvasHeight">高度</label>
+                        <input type="number" id="canvasHeight" value="600" min="100" max="2000">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>纹理类型</label>
+                    <select id="patternType" style="width: 100%; padding: 12px; border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; background: rgba(255,255,255,0.05); color: #fff; font-size: 14px;">
+                        <option value="vpattern">V形锯齿线</option>
+                        <option value="wave">波浪线</option>
+                        <option value="chevron">横向二值化雪佛龙纹</option>
+                        <option value="grid">方形网格纹</option>
+                        <option value="diamond">菱形图案</option>
+                        <option value="circles">同心圆</option>
+                        <option value="dots">点阵图案</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="linePeriod">线条周期 T（像素）
+                        <span class="slider-value" id="periodValue">4</span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="linePeriod" min="2" max="20" value="4" step="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="hiddenStrength">隐藏强度（值越大文字越明显）
+                        <span class="slider-value" id="strengthValue">0.40</span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="hiddenStrength" min="0" max="1" value="0.4" step="0.01">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="blurRadius">文字模糊半径（像素）
+                        <span class="slider-value" id="blurValue">6</span>
+                    </label>
+                    <div class="slider-container">
+                        <input type="range" id="blurRadius" min="1" max="30" value="6" step="1">
+                    </div>
+                    <label style="font-size: 12px; color: rgba(255,255,255,0.5); margin-top: 5px;">提示：建议设置为线条周期的1.5倍</label>
+                </div>
+
+                <div class="form-group">
+                    <label>快速预设</label>
+                    <div class="preset-buttons">
+                        <button class="preset-btn" onclick="applyPreset('fine')">精细纹理</button>
+                        <button class="preset-btn" onclick="applyPreset('normal')">标准纹理</button>
+                        <button class="preset-btn" onclick="applyPreset('coarse')">粗糙纹理</button>
+                        <button class="preset-btn" onclick="applyPreset('high')">高隐藏度</button>
+                    </div>
+                </div>
+
+                <div class="form-group" id="licenseSection">
+                    <label>🔑 授权解锁高级功能 <span style="background: linear-gradient(135deg, #00d4ff, #9c27b0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 12px;">随机化纹理 | 高斯噪点 | 多层叠加 | 颜色干扰</span></label>
+                    <div class="btn-row">
+                        <input type="text" id="licenseKey" placeholder="请输入授权码" style="flex: 1;">
+                        <button class="btn btn-secondary" onclick="verifyLicense()">验证授权</button>
+                        <button class="btn btn-donate" onclick="showDonationQR()">💝 支持作者</button>
+                    </div>
+                </div>
+
+                <div class="form-group" id="advancedSection" style="display: none;">
+                    <div class="panel" style="background: rgba(0, 212, 255, 0.1); border-color: rgba(0, 212, 255, 0.3);">
+                        <div class="panel-title" style="font-size: 16px;">🎯 高级风控功能（已解锁）</div>
+                        
+                        <div class="form-group">
+                            <label><input type="checkbox" id="enableRandom"> 随机化纹理偏移</label>
+                            <span style="color: rgba(255,255,255,0.6); font-size: 12px;">增加纹理随机性，干扰检测</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><input type="checkbox" id="enableNoise"> 添加高斯噪点</label>
+                            <span style="color: rgba(255,255,255,0.6); font-size: 12px;">增加背景复杂度</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><input type="checkbox" id="enableMultiLayer"> 多层叠加模式</label>
+                            <span style="color: rgba(255,255,255,0.6); font-size: 12px;">多重纹理叠加，增强隐藏效果</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><input type="checkbox" id="enableColorNoise"> 低饱和度颜色干扰</label>
+                            <span style="color: rgba(255,255,255,0.6); font-size: 12px;">添加微弱颜色，干扰AI识别</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="noiseLevel">噪点强度
+                                <span class="slider-value" id="noiseLevelValue">0.1</span>
+                            </label>
+                            <div class="slider-container">
+                                <input type="range" id="noiseLevel" min="0" max="0.5" value="0.1" step="0.01">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="btn-row">
+                    <button class="btn btn-primary" onclick="generateImage()">🎨 生成图像</button>
+                    <button class="btn btn-secondary" onclick="generateDecryptionStrip()">📐 生成解密条纹</button>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">🖼️ 输出结果</div>
+                
+                <div class="canvas-container">
+                    <canvas id="outputCanvas" width="800" height="600"></canvas>
+                    
+                    <div class="download-links">
+                        <button class="btn btn-secondary" style="width: auto; padding: 10px 20px;" onclick="downloadImage()">💾 下载图像</button>
+                        <button class="btn btn-secondary" style="width: auto; padding: 10px 20px;" onclick="downloadDecryptionStrip()">📥 下载解密条纹</button>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <p><strong>使用说明：</strong></p>
+                    <p>1. 输入要隐藏的文字内容</p>
+                    <p>2. 调整参数，点击生成图像</p>
+                    <p>3. 直接观察只能看到条纹，眯眼或倾斜视角可看到隐藏文字</p>
+                    <p>4. 使用解密条纹覆盖图像也可解密</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="copyright">
+            版权所有 © 匆匆 | 微信：7033066
+        </div>
+    </div>
+
+    <div class="modal" id="donationModal" onclick="closeDonationModal()">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <h3>💝 感谢您的支持</h3>
+            <img src="donation_qr.png" alt="收款码" style="width: 250px; height: 250px; border-radius: 10px; object-fit: cover;">
+            <button class="modal-close" onclick="closeDonationModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        const hiddenText = document.getElementById('hiddenText');
+        const canvasWidth = document.getElementById('canvasWidth');
+        const canvasHeight = document.getElementById('canvasHeight');
+        const linePeriod = document.getElementById('linePeriod');
+        const hiddenStrength = document.getElementById('hiddenStrength');
+        const blurRadius = document.getElementById('blurRadius');
+        const periodValue = document.getElementById('periodValue');
+        const strengthValue = document.getElementById('strengthValue');
+        const blurValue = document.getElementById('blurValue');
+        const outputCanvas = document.getElementById('outputCanvas');
+        const patternType = document.getElementById('patternType');
+        const noiseLevelValue = document.getElementById('noiseLevelValue');
+        
+        const enableRandom = document.getElementById('enableRandom');
+        const enableNoise = document.getElementById('enableNoise');
+        const enableMultiLayer = document.getElementById('enableMultiLayer');
+        const enableColorNoise = document.getElementById('enableColorNoise');
+        const noiseLevel = document.getElementById('noiseLevel');
+
+        linePeriod.addEventListener('input', () => {
+            periodValue.textContent = linePeriod.value;
+            blurRadius.value = Math.round(parseFloat(linePeriod.value) * 1.5);
+            blurValue.textContent = blurRadius.value;
+        });
+
+        hiddenStrength.addEventListener('input', () => {
+            strengthValue.textContent = parseFloat(hiddenStrength.value).toFixed(2);
+        });
+
+        blurRadius.addEventListener('input', () => {
+            blurValue.textContent = blurRadius.value;
+        });
+
+        noiseLevel.addEventListener('input', () => {
+            noiseLevelValue.textContent = parseFloat(noiseLevel.value).toFixed(2);
+        });
+
+        function showDonationQR() {
+            document.getElementById('donationModal').classList.add('active');
+        }
+
+        function closeDonationModal() {
+            document.getElementById('donationModal').classList.remove('active');
+        }
+
+        function verifyLicense() {
+            const key = document.getElementById('licenseKey').value.trim().toUpperCase();
+            
+            const validKeys = ['VIP2024', 'MOIREPRO', 'CHONGCHONG', 'FREETRIAL'];
+            
+            if (validKeys.includes(key)) {
+                localStorage.setItem('moire_activated', 'true');
+                document.getElementById('advancedSection').style.display = 'block';
+                document.getElementById('licenseSection').style.display = 'none';
+                alert('授权成功！高级风控功能已解锁');
+            } else {
+                alert('无效的授权码，请联系开发者获取授权');
+            }
+        }
+
+        window.addEventListener('load', () => {
+            if (localStorage.getItem('moire_activated') === 'true') {
+                document.getElementById('advancedSection').style.display = 'block';
+                document.getElementById('licenseSection').style.display = 'none';
+            }
+        });
+
+        function applyPreset(type) {
+            switch(type) {
+                case 'fine':
+                    linePeriod.value = 3;
+                    periodValue.textContent = '3';
+                    blurRadius.value = 5;
+                    blurValue.textContent = '5';
+                    hiddenStrength.value = 0.15;
+                    strengthValue.textContent = '0.15';
+                    break;
+                case 'normal':
+                    linePeriod.value = 4;
+                    periodValue.textContent = '4';
+                    blurRadius.value = 6;
+                    blurValue.textContent = '6';
+                    hiddenStrength.value = 0.20;
+                    strengthValue.textContent = '0.20';
+                    break;
+                case 'coarse':
+                    linePeriod.value = 8;
+                    periodValue.textContent = '8';
+                    blurRadius.value = 12;
+                    blurValue.textContent = '12';
+                    hiddenStrength.value = 0.25;
+                    strengthValue.textContent = '0.25';
+                    break;
+                case 'high':
+                    linePeriod.value = 4;
+                    periodValue.textContent = '4';
+                    blurRadius.value = 6;
+                    blurValue.textContent = '6';
+                    hiddenStrength.value = 0.10;
+                    strengthValue.textContent = '0.10';
+                    break;
+            }
+        }
+
+        function generateVPattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            const halfPeriod = Math.floor(period / 2);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const modX = x % period;
+                    const modY = y % period;
+                    
+                    if ((modX + modY) < period) {
+                        const intensity = Math.round((modX + modY) / period * 255);
+                        ctx.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+                        ctx.fillRect(x, y, 1, 1);
+                    } else {
+                        const intensity = Math.round((2 * period - modX - modY) / period * 255);
+                        ctx.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+            
+            return canvas;
+        }
+
+        function generateWavePattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            const amplitude = period / 4;
+            const frequency = Math.PI * 2 / period;
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const wave = Math.sin(x * frequency) * amplitude + amplitude;
+                    const t = (wave / period) % 1;
+                    const intensity = Math.round(t * 255);
+                    ctx.fillStyle = `rgb(${intensity}, ${intensity}, ${intensity})`;
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+            
+            return canvas;
+        }
+
+        function generateChevronPattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#000000';
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const diag = (x + y) % (2 * period);
+                    
+                    if (diag >= period) {
+                        ctx.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+            
+            return canvas;
+        }
+
+        function generateTextLayer(width, height, text, blurRadius) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.font = `bold ${Math.max(24, width / 10)}px Arial, sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            const texts = text.split('\n');
+            const lineHeight = Math.max(30, width / 8);
+            const startY = (height - (texts.length - 1) * lineHeight) / 2;
+            
+            ctx.fillStyle = '#fff';
+            texts.forEach((line, i) => {
+                ctx.fillText(line, width / 2, startY + i * lineHeight);
+            });
+            
+            ctx.filter = `blur(${blurRadius}px)`;
+            const blurredCanvas = document.createElement('canvas');
+            blurredCanvas.width = width;
+            blurredCanvas.height = height;
+            const blurredCtx = blurredCanvas.getContext('2d');
+            blurredCtx.drawImage(canvas, 0, 0);
+            
+            return blurredCanvas;
+        }
+
+        function generateGridPattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#000';
+            const lineWidth = 1;
+            
+            for (let x = 0; x < width; x += period) {
+                ctx.fillRect(x, 0, lineWidth, height);
+            }
+            for (let y = 0; y < height; y += period) {
+                ctx.fillRect(0, y, width, lineWidth);
+            }
+            
+            return canvas;
+        }
+
+        function generateDiamondPattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#000';
+            
+            for (let row = 0; row < height; row += period) {
+                for (let col = 0; col < width; col += period * 2) {
+                    const offset = row % (period * 2) === 0 ? 0 : period;
+                    ctx.beginPath();
+                    ctx.moveTo(col + offset + period / 2, row);
+                    ctx.lineTo(col + offset + period, row + period / 2);
+                    ctx.lineTo(col + offset + period / 2, row + period);
+                    ctx.lineTo(col + offset, row + period / 2);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            }
+            
+            return canvas;
+        }
+
+        function generateCirclesPattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#000';
+            const radius = period / 3;
+            
+            for (let y = radius; y < height; y += period) {
+                for (let x = radius; x < width; x += period) {
+                    ctx.beginPath();
+                    ctx.arc(x, y, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            }
+            
+            return canvas;
+        }
+
+        function generateDotsPattern(width, height, period) {
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            ctx.fillStyle = '#000';
+            const dotSize = period / 3;
+            
+            for (let y = dotSize; y < height; y += period) {
+                const offset = (Math.floor(y / period) % 2) * (period / 2);
+                for (let x = dotSize + offset; x < width; x += period) {
+                    ctx.fillRect(x - dotSize / 2, y - dotSize / 2, dotSize, dotSize);
+                }
+            }
+            
+            return canvas;
+        }
+
+        function generateImage() {
+            const text = hiddenText.value || 'Hidden Text';
+            const width = parseInt(canvasWidth.value) || 800;
+            const height = parseInt(canvasHeight.value) || 600;
+            const period = parseInt(linePeriod.value) || 4;
+            const strength = parseFloat(hiddenStrength.value) || 0.2;
+            const blur = parseInt(blurRadius.value) || Math.round(period * 1.5);
+            const type = patternType.value || 'vpattern';
+            
+            let patternCanvas;
+            if (type === 'wave') {
+                patternCanvas = generateWavePattern(width, height, period);
+            } else if (type === 'chevron') {
+                patternCanvas = generateChevronPattern(width, height, period);
+            } else if (type === 'grid') {
+                patternCanvas = generateGridPattern(width, height, period);
+            } else if (type === 'diamond') {
+                patternCanvas = generateDiamondPattern(width, height, period);
+            } else if (type === 'circles') {
+                patternCanvas = generateCirclesPattern(width, height, period);
+            } else if (type === 'dots') {
+                patternCanvas = generateDotsPattern(width, height, period);
+            } else {
+                patternCanvas = generateVPattern(width, height, period);
+            }
+            
+            const textCanvas = generateTextLayer(width, height, text, blur);
+            
+            outputCanvas.width = width;
+            outputCanvas.height = height;
+            const ctx = outputCanvas.getContext('2d');
+            
+            ctx.drawImage(patternCanvas, 0, 0);
+            
+            const patternData = patternCanvas.getContext('2d').getImageData(0, 0, width, height);
+            const textData = textCanvas.getContext('2d').getImageData(0, 0, width, height);
+            const outputData = ctx.createImageData(width, height);
+            
+            const patternPixels = patternData.data;
+            const textPixels = textData.data;
+            const outputPixels = outputData.data;
+            
+            const activated = localStorage.getItem('moire_activated') === 'true';
+            const useRandom = activated && enableRandom.checked;
+            const useNoise = activated && enableNoise.checked;
+            const useMultiLayer = activated && enableMultiLayer.checked;
+            const useColorNoise = activated && enableColorNoise.checked;
+            const noiseLvl = parseFloat(noiseLevel.value);
+            
+            const randomOffset = useRandom ? Math.floor(Math.random() * 10) : 0;
+            
+            for (let i = 0; i < patternPixels.length; i += 4) {
+                const idx = i / 4;
+                const px = idx % width;
+                const py = Math.floor(idx / width);
+                
+                let patternVal = patternPixels[i];
+                
+                if (useRandom) {
+                    const offsetPeriod = (px + randomOffset) % period;
+                    patternVal = offsetPeriod < period / 2 ? 255 : 0;
+                }
+                
+                const textVal = textPixels[i];
+                
+                let outputVal = patternVal;
+                if (textVal > 128) {
+                    const diff = (textVal - 128) / 128;
+                    outputVal = Math.round(patternVal + diff * strength * 80);
+                } else {
+                    const diff = (128 - textVal) / 128;
+                    outputVal = Math.round(patternVal - diff * strength * 80);
+                }
+                
+                if (useNoise) {
+                    const noise = (Math.random() - 0.5) * noiseLvl * 50;
+                    outputVal += noise;
+                }
+                
+                if (useMultiLayer && (px + py) % 3 === 0) {
+                    outputVal = Math.round(outputVal * 0.95);
+                }
+                
+                outputVal = Math.max(0, Math.min(255, outputVal));
+                
+                let r = outputVal, g = outputVal, b = outputVal;
+                
+                if (useColorNoise) {
+                    r += (Math.random() - 0.5) * noiseLvl * 10;
+                    g += (Math.random() - 0.5) * noiseLvl * 8;
+                    b += (Math.random() - 0.5) * noiseLvl * 12;
+                }
+                
+                r = Math.max(0, Math.min(255, r));
+                g = Math.max(0, Math.min(255, g));
+                b = Math.max(0, Math.min(255, b));
+                
+                outputPixels[i] = Math.round(r);
+                outputPixels[i + 1] = Math.round(g);
+                outputPixels[i + 2] = Math.round(b);
+                outputPixels[i + 3] = 255;
+            }
+            
+            ctx.putImageData(outputData, 0, 0);
+        }
+
+        function generateDecryptionStrip() {
+            const width = parseInt(canvasWidth.value) || 800;
+            const height = parseInt(canvasHeight.value) || 600;
+            const period = parseInt(linePeriod.value) || 4;
+            
+            outputCanvas.width = width;
+            outputCanvas.height = height;
+            const ctx = outputCanvas.getContext('2d');
+            
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(0, 0, width, height);
+            
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    const t = (x / period) % 2;
+                    if (t < 0.5) {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+                    } else {
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0)';
+                    }
+                    ctx.fillRect(x, y, 1, 1);
+                }
+            }
+        }
+
+        function downloadImage() {
+            const link = document.createElement('a');
+            link.download = `moire-hidden-text-${Date.now()}.png`;
+            link.href = outputCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        function downloadDecryptionStrip() {
+            generateDecryptionStrip();
+            const link = document.createElement('a');
+            link.download = `decryption-strip-${Date.now()}.png`;
+            link.href = outputCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        generateImage();
+    </script>
+</body>
+</html>
